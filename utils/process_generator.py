@@ -8,7 +8,8 @@ def generate_processes(n=10):
         process = {
             "pid": i + 1,
             "arrival_time": random.randint(0, 10),
-            "burst_time": random.randint(1, 20)
+            "burst_time": random.randint(1, 20),
+            "priority": random.randint(1, 5)
         }
         processes.append(process)
 

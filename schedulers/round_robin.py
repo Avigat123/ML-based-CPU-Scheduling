@@ -7,6 +7,7 @@ def round_robin_scheduling(df, time_quantum=2):
     current_time = 0
     queue = []
     completed = set()
+    gantt_chart = []
 
     waiting_times = {pid: 0 for pid in remaining_burst}
     last_executed = {pid: 0 for pid in remaining_burst}
@@ -30,6 +31,7 @@ def round_robin_scheduling(df, time_quantum=2):
         waiting_times[pid] += current_time - last_executed[pid]
 
         exec_time = min(time_quantum, remaining_burst[pid])
+        gantt_chart.append((pid, current_time))
         remaining_burst[pid] -= exec_time
         current_time += exec_time
 
@@ -56,4 +58,4 @@ def round_robin_scheduling(df, time_quantum=2):
     avg_wt = sum(waiting_times.values()) / len(waiting_times)
     avg_tat = sum(turnaround_times.values()) / len(turnaround_times)
 
-    return df, avg_wt, avg_tat
+    return df, avg_wt, avg_tat, gantt_chart

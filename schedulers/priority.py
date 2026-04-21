@@ -1,12 +1,14 @@
-def fcfs_scheduling(df):
-    df = df.sort_values(by="arrival_time").copy()
+def priority_scheduling(df):
+    df = df.copy()
+
+    # Sort by priority first, then arrival time
+    df = df.sort_values(by=["priority", "arrival_time"])
 
     current_time = 0
     waiting_times = []
     turnaround_times = []
-    process_order = []
 
-    for index, row in df.iterrows():
+    for _, row in df.iterrows():
         arrival = row["arrival_time"]
         burst = row["burst_time"]
 
@@ -17,7 +19,7 @@ def fcfs_scheduling(df):
         turnaround_time = waiting_time + burst
 
         current_time += burst
-        process_order.append(row)
+
         waiting_times.append(waiting_time)
         turnaround_times.append(turnaround_time)
 
@@ -27,4 +29,4 @@ def fcfs_scheduling(df):
     avg_wt = sum(waiting_times) / len(waiting_times)
     avg_tat = sum(turnaround_times) / len(turnaround_times)
 
-    return df, avg_wt, avg_tat, process_order
+    return df, avg_wt, avg_tat
