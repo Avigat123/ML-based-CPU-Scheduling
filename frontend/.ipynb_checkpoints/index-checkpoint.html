@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ML-Based CPU Scheduler — Compare Scheduling Algorithms</title>
+    <meta name="description" content="An interactive tool that compares CPU scheduling algorithms (FCFS, SJF, Round Robin, Priority, SRTF) against a machine-learning-based scheduler that predicts burst times.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- Header -->
+    <header id="site-header">
+        <div class="container header-inner">
+            <div class="logo">
+                <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                    <rect x="2" y="6" width="8" height="16" rx="1.5" fill="#0d9488"/>
+                    <rect x="12" y="2" width="8" height="24" rx="1.5" fill="#0d9488" opacity="0.7"/>
+                    <rect x="22" y="10" width="4" height="12" rx="1.5" fill="#0d9488" opacity="0.4"/>
+                </svg>
+                <span>ML CPU Scheduler</span>
+            </div>
+            <nav id="main-nav">
+                <a href="#how-it-works">How It Works</a>
+                <a href="#simulator">Try It</a>
+                <a href="#algorithms">Algorithms</a>
+                <a href="#architecture">Architecture</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero -->
+    <section id="hero">
+        <div class="container">
+            <h1>CPU scheduling that learns from data</h1>
+            <p class="hero-sub">
+                Traditional schedulers use fixed rules. This one uses a RandomForest model to
+                predict burst times and schedule smarter. Run the simulator below to see actual numbers.
+            </p>
+            <div class="hero-actions">
+                <a href="#simulator" class="btn btn-primary" id="hero-cta">Run the Simulator</a>
+                <a href="https://github.com" class="btn btn-secondary" id="hero-source" target="_blank" rel="noopener">View Source</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section id="how-it-works">
+        <div class="container">
+            <h2>How it works</h2>
+            <p class="section-desc">Three steps. No magic.</p>
+            <div class="steps-grid">
+                <div class="step" id="step-1">
+                    <span class="step-number">1</span>
+                    <h3>Generate processes</h3>
+                    <p>Random processes are created with arrival times, burst times, and priorities — just like a real OS workload.</p>
+                </div>
+                <div class="step" id="step-2">
+                    <span class="step-number">2</span>
+                    <h3>Predict burst times</h3>
+                    <p>A trained RandomForest model predicts how long each process will take, using arrival time as input.</p>
+                </div>
+                <div class="step" id="step-3">
+                    <span class="step-number">3</span>
+                    <h3>Schedule and compare</h3>
+                    <p>All six algorithms run on the same process set. You see the actual waiting times and turnaround times side by side.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Simulator -->
+    <section id="simulator">
+        <div class="container">
+            <h2>Interactive simulator</h2>
+            <p class="section-desc">Configure, run, and compare all six algorithms on the same data.</p>
+
+            <div class="sim-controls" id="sim-controls">
+                <div class="control-group">
+                    <label for="process-count">Number of processes</label>
+                    <input type="number" id="process-count" min="3" max="30" value="8">
+                </div>
+                <div class="control-group">
+                    <label for="time-quantum">Round Robin time quantum</label>
+                    <input type="number" id="time-quantum" min="1" max="10" value="2">
+                </div>
+                <button class="btn btn-primary" id="run-sim-btn">Run All Schedulers</button>
+            </div>
+
+            <!-- Process Table -->
+            <div class="sim-section" id="process-table-section" style="display:none;">
+                <h3>Generated processes</h3>
+                <div class="table-wrap">
+                    <table id="process-table">
+                        <thead>
+                            <tr>
+                                <th>PID</th>
+                                <th>Arrival</th>
+                                <th>Burst</th>
+                                <th>Priority</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Results -->
+            <div class="sim-section" id="results-section" style="display:none;">
+                <h3>Results</h3>
+                <div class="results-grid" id="results-grid"></div>
+            </div>
+
+            <!-- Bar Charts -->
+            <div class="sim-section" id="charts-section" style="display:none;">
+                <h3>Comparison</h3>
+                <div class="charts-row">
+                    <div class="chart-box">
+                        <h4>Average Waiting Time</h4>
+                        <canvas id="wt-chart"></canvas>
+                    </div>
+                    <div class="chart-box">
+                        <h4>Average Turnaround Time</h4>
+                        <canvas id="tat-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gantt Charts -->
+            <div class="sim-section" id="gantt-section" style="display:none;">
+                <h3>Gantt charts</h3>
+                <div class="gantt-tabs" id="gantt-tabs"></div>
+                <div class="gantt-canvas-wrap">
+                    <canvas id="gantt-chart"></canvas>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Algorithms -->
+    <section id="algorithms">
+        <div class="container">
+            <h2>The six algorithms</h2>
+            <p class="section-desc">Each one handles process scheduling differently. Here's what each actually does.</p>
+            <div class="algo-grid">
+                <div class="algo-card" id="algo-fcfs">
+                    <h3>FCFS</h3>
+                    <span class="algo-tag">Non-preemptive</span>
+                    <p>First Come First Serve. Processes run in arrival order. Simple, but long processes block short ones.</p>
+                    <div class="algo-detail">
+                        <span class="detail-label">Time complexity</span>
+                        <span class="detail-value">O(n log n)</span>
+                    </div>
+                </div>
+                <div class="algo-card" id="algo-sjf">
+                    <h3>SJF</h3>
+                    <span class="algo-tag">Non-preemptive</span>
+                    <p>Shortest Job First. Picks the process with the smallest burst time. Gives the best average wait — if you know burst times in advance.</p>
+                    <div class="algo-detail">
+                        <span class="detail-label">Time complexity</span>
+                        <span class="detail-value">O(n²)</span>
+                    </div>
+                </div>
+                <div class="algo-card" id="algo-rr">
+                    <h3>Round Robin</h3>
+                    <span class="algo-tag">Preemptive</span>
+                    <p>Each process gets a fixed time slice. Fair, but lots of context switches. Performance depends on the quantum size.</p>
+                    <div class="algo-detail">
+                        <span class="detail-label">Time complexity</span>
+                        <span class="detail-value">O(n × total_burst / quantum)</span>
+                    </div>
+                </div>
+                <div class="algo-card" id="algo-priority">
+                    <h3>Priority</h3>
+                    <span class="algo-tag">Non-preemptive</span>
+                    <p>Processes with higher priority (lower number) run first. Can starve low-priority processes indefinitely.</p>
+                    <div class="algo-detail">
+                        <span class="detail-label">Time complexity</span>
+                        <span class="detail-value">O(n²)</span>
+                    </div>
+                </div>
+                <div class="algo-card" id="algo-srtf">
+                    <h3>SRTF</h3>
+                    <span class="algo-tag">Preemptive</span>
+                    <p>Shortest Remaining Time First. Like SJF, but preempts the running process if a shorter one arrives. Very responsive.</p>
+                    <div class="algo-detail">
+                        <span class="detail-label">Time complexity</span>
+                        <span class="detail-value">O(n × max_burst)</span>
+                    </div>
+                </div>
+                <div class="algo-card algo-card-accent" id="algo-ml">
+                    <h3>ML-Based</h3>
+                    <span class="algo-tag algo-tag-accent">Machine Learning</span>
+                    <p>Uses a RandomForest model to predict burst times from arrival time, then sorts by predicted burst — like SJF, but without needing to know burst times upfront.</p>
+                    <div class="algo-detail">
+                        <span class="detail-label">Model</span>
+                        <span class="detail-value">RandomForestRegressor</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Architecture -->
+    <section id="architecture">
+        <div class="container">
+            <h2>Project structure</h2>
+            <p class="section-desc">How the codebase is organized.</p>
+            <div class="arch-diagram" id="arch-diagram">
+                <div class="arch-row">
+                    <div class="arch-box arch-main">
+                        <code>main.py</code>
+                        <span>Entry point — runs all schedulers and plots results</span>
+                    </div>
+                </div>
+                <div class="arch-arrow">↓</div>
+                <div class="arch-row arch-row-multi">
+                    <div class="arch-box">
+                        <code>schedulers/</code>
+                        <span>fcfs, sjf, round_robin, priority, srtf, ml_scheduler</span>
+                    </div>
+                    <div class="arch-box">
+                        <code>models/</code>
+                        <span>train_model.py, model.pkl (RandomForest)</span>
+                    </div>
+                </div>
+                <div class="arch-arrow">↓</div>
+                <div class="arch-row arch-row-multi">
+                    <div class="arch-box">
+                        <code>utils/</code>
+                        <span>process_generator — creates random workloads</span>
+                    </div>
+                    <div class="arch-box">
+                        <code>results/</code>
+                        <span>graphs.py, gantt.py — matplotlib visualizations</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tech Stack -->
+    <section id="tech-stack">
+        <div class="container">
+            <h2>Built with</h2>
+            <div class="tech-list">
+                <div class="tech-item" id="tech-python">
+                    <span class="tech-name">Python</span>
+                    <span class="tech-desc">Core scheduling logic</span>
+                </div>
+                <div class="tech-item" id="tech-sklearn">
+                    <span class="tech-name">scikit-learn</span>
+                    <span class="tech-desc">RandomForest model</span>
+                </div>
+                <div class="tech-item" id="tech-pandas">
+                    <span class="tech-name">Pandas</span>
+                    <span class="tech-desc">Data handling</span>
+                </div>
+                <div class="tech-item" id="tech-numpy">
+                    <span class="tech-name">NumPy</span>
+                    <span class="tech-desc">Numerical operations</span>
+                </div>
+                <div class="tech-item" id="tech-matplotlib">
+                    <span class="tech-name">Matplotlib</span>
+                    <span class="tech-desc">Charts and Gantt diagrams</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="site-footer">
+        <div class="container footer-inner">
+            <p>ML-Based CPU Scheduling — A machine learning approach to OS process scheduling.</p>
+            <div class="footer-links">
+                <a href="#hero">Top</a>
+                <a href="#simulator">Simulator</a>
+                <a href="#algorithms">Algorithms</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="scheduler.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
