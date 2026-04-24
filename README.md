@@ -15,6 +15,7 @@ It ships with **six scheduling algorithms**, a **Python backend** for training a
 | **Classic Algorithms** | FCFS · SJF · Round Robin · Priority · SRTF |
 | **ML Scheduler** | RandomForestRegressor predicts burst → sorts like SJF |
 | **Visualisation (Python)** | Matplotlib bar charts & Gantt diagrams |
+| **Jupyter Notebook** | Step-by-step interactive notebook — run each cell, inspect DataFrames, and view inline plots |
 | **Interactive Frontend** | Browser simulator with configurable process count, time quantum, live bar charts, and Gantt charts — no backend required |
 | **Performance Metrics** | Average Waiting Time (WT) and Turnaround Time (TAT) for every algorithm |
 
@@ -25,6 +26,7 @@ It ships with **six scheduling algorithms**, a **Python backend** for training a
 ```
 ML-based-CPU-Scheduling/
 ├── main.py                  # Entry point — runs all schedulers & plots results
+├── Untitled.ipynb           # Jupyter Notebook — interactive walkthrough of the full pipeline
 ├── requirements.txt         # Python dependencies
 │
 ├── schedulers/              # Scheduling algorithm implementations
@@ -106,6 +108,32 @@ python -m http.server 8000 -d frontend
 # then visit http://localhost:8000
 ```
 
+### 5 · Explore via Jupyter Notebook
+
+The project includes a **Jupyter Notebook** (`Untitled.ipynb`) that lets you interactively walk through every step — generate processes, run all six schedulers, inspect result DataFrames, and view inline Matplotlib plots — all from a single notebook.
+
+```bash
+# Install Jupyter (if not already installed)
+pip install jupyter
+
+# Launch Jupyter Notebook
+jupyter notebook
+```
+
+This opens the Jupyter dashboard in your browser. Navigate to the project folder and open **`Untitled.ipynb`**.
+
+> **Tip:** You can also launch directly with:
+> ```bash
+> jupyter notebook Untitled.ipynb
+> ```
+
+Inside the notebook you'll find cells that:
+1. Import all schedulers and utilities
+2. Generate a set of random processes and display them as a DataFrame
+3. Run FCFS, SJF, Round Robin, Priority, SRTF, and ML schedulers
+4. Collect and display average WT / TAT results
+5. Plot comparison bar charts and Gantt diagrams inline
+
 ---
 
 ## 🔬 How It Works
@@ -170,6 +198,7 @@ The `frontend/` directory contains a **standalone, zero-dependency web app** tha
 |---|---|
 | **Backend** | Python · scikit-learn · Pandas · NumPy · Matplotlib |
 | **ML Model** | RandomForestRegressor (scikit-learn) |
+| **Notebook** | Jupyter Notebook |
 | **Frontend** | HTML5 · CSS3 · Vanilla JavaScript · Canvas API |
 | **Fonts** | Inter (Google Fonts) |
 
